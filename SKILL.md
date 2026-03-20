@@ -38,6 +38,7 @@ was learned from a real production failure.
 - **Never discard a failed response.** Log the full raw output alongside the error — it's diagnostic data you paid for.
 - On schema validation failure, report: raw output, which rule failed, which field(s).
 - **Persist incrementally.** Write completed rows as they finish, not in a batch at the end. A crash should lose one row, not all of them.
+- **Errors are signal, not trash.** After a run, review error rows for patterns. Repeated schema failures mean the prompt needs tightening. Repeated fetch failures mean the target or method needs changing. Do not accept an error rate — diagnose it. Every errored row is a feedback loop you either use or pay for again next run.
 
 ## Completion criteria
 
@@ -63,3 +64,4 @@ Before starting any data research run, confirm:
 - [ ] Incremental output persistence enabled
 - [ ] Error logging captures raw responses
 - [ ] Schema validation runs before row completion
+- [ ] Post-run error review planned (not just "re-run and hope")

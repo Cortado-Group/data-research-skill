@@ -84,6 +84,30 @@ matches the contract or the row fails loudly.
 }
 ```
 
+## Error results treated as trash
+
+**What you see:** 15% error rate. You re-run. 12% error rate. You re-run again.
+Eventually you get enough rows and move on.
+**What's actually happening:** The errors are telling you exactly what's wrong —
+the prompt is ambiguous, the schema doesn't handle a common edge case, or a
+specific source is consistently returning a format the parser doesn't expect.
+Nobody looks. The error rows get thrown away and re-run blindly, paying full
+cost each time for the same failures.
+
+The model will never stop to say "these errors have a pattern." It will
+re-run the same broken prompt against the same broken source and produce the
+same broken output, indefinitely. It treats every row as independent. You
+shouldn't.
+
+**Fix:** After every run, aggregate errors by type. Ask:
+- Are the same fields failing repeatedly? → Tighten the prompt or loosen the schema constraint.
+- Is a specific source returning unexpected formats? → Add source-specific parsing or skip it.
+- Are timeouts clustered on certain entities? → Those entities need a different fetch strategy.
+- Is the model inventing data for a specific field? → That field needs a stronger constraint or a `null` allowance.
+
+The error rows are the cheapest research you'll ever do — you already paid for
+them. Throwing them away and re-running is paying twice to learn nothing.
+
 ## No-code enrichment tools (Clay, etc.)
 
 All the above failures also occur in no-code enrichment tools — but with no
@@ -107,3 +131,4 @@ just cost. This is why owning the pipeline matters.
 | Timeout kills completed work | Full cost, zero output | Incremental persist |
 | Invalid JSON accepted | Full pipeline re-run | Schema validation |
 | Key name drift | Valid data silently dropped | Strict schema |
+| Errors treated as trash | Repeated re-runs, same failures | Post-run error review |
