@@ -10,7 +10,7 @@ cover_image:
 
 Everyone says you don't need developers anymore.
 
-Coding is dying. AI writes better code than humans. Anyone can ship software
+Coding is a dying art. AI writes better code than humans. Anyone can ship software
 now. Just describe what you want and let the model handle it.
 
 The AI companies love this narrative. They should. It's great for token sales.
@@ -148,7 +148,7 @@ You can validate the schema. The fixes exist. You just have to write them.
 
 Now try doing this in Clay, or any AI enrichment tool that runs on credits.
 
-Same model. Same failure modes. But now:
+Same model. Same traps. But now:
 
 - You can't adjust the timeout
 - You can't clean a malformed response before it hits the pipeline
@@ -241,7 +241,7 @@ consistently make expensive, silent mistakes. These rules are the fix.
   No additional keys. No renamed keys. No missing required fields.
 - If you are uncertain about a value, use null. Do not invent data,
   abbreviate field names, or restructure the schema.
-- Key name drift is a failure mode. `company_name` is not `companyName`
+- Key name drift is a silent killer. `company_name` is not `companyName`
   is not `name`. Use the exact key specified. Every time.
 
 ---
