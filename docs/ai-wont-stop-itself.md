@@ -25,10 +25,11 @@ is **invisible to someone who handed the problem to AI and walked away.**
 
 ### Rate limit cascade
 
-**What you see:** The pipeline eventually finishes.  
+**What you see:** The pipeline is quietly working away.  
 **What's actually happening:** 200+ failed API calls hammering a rate-limited
 endpoint with zero backoff. Every retry is immediate. Every failure is silent.
-You find out when you get the bill.
+You walk away thinking progress is being made. You come back to nothing.
+You're starting over.
 
 ---
 
@@ -44,17 +45,27 @@ fix is five lines. The model never suggested it.
 ### Re-fetching the same URLs four times per company
 
 **What you see:** Thorough research.  
-**What's actually happening:** No cache. Same URL, same response, four times.
-You paid for that content once. You paid for it four times.
+**What's actually happening:** No cache. The model has no memory within a run
+that it already retrieved something. Each subtask goes back to the same URL
+independently, as if it's the first time. Same request, same response, four
+times — burning time and compute on work that was already done.
 
 ---
 
-### Discarding error responses
+### Throwing away error results
 
-**What you see:** The pipeline flagged some failures.  
-**What's actually happening:** The raw error response — the diagnostic artifact
-you paid for — was quietly thrown away. The log says *error*. It does not say
-*why*.
+**What you see:** Some rows failed. Moving on.  
+**What's actually happening:** The model returned something malformed, the
+pipeline labeled it garbage and discarded it — without logging what the
+response actually said. No record. No pattern. No handler.
+
+Bad outputs are data. They tell you exactly where your prompt breaks, where
+your schema has gaps, where your downstream handling makes bad assumptions.
+Throw them away and you're not just losing a row — you're guaranteeing you'll
+lose the same row the same way every time you run.
+
+The only path to a more reliable pipeline is understanding why it fails.
+You can't do that if you're in the habit of quietly deleting the evidence.
 
 ---
 
@@ -169,7 +180,7 @@ want to go get it:
 
 ---
 
-{% github your-handle/data-research-skill %}
+{% github Cortado-Group/data-research-skill %}
 
 ---
 
@@ -220,6 +231,11 @@ consistently make expensive, silent mistakes. These rules are the fix.
 - Completed work must be written incrementally. Do not wait for a full run
   to complete before persisting output. If a timeout occurs, completed rows
   should already be saved.
+- Errors are signal, not trash. After a run, review error rows for patterns.
+  Repeated schema failures mean the prompt needs tightening. Repeated fetch
+  failures mean the target or method needs changing. Do not accept an error
+  rate — diagnose it. Every errored row is a feedback loop you either use
+  or pay for again next run.
 
 ---
 
@@ -235,6 +251,47 @@ A row is done when:
 A row that errored is still done — but it must carry its diagnostic payload.
 "Error" with no context is not an acceptable output.
 ```
+
+---
+
+## Determinism is the whole game
+
+Code is deterministic. Given the same input, it returns the same output.
+Every time. That's not a feature — it's the foundation every reliable system
+is built on.
+
+AI is not deterministic. Same prompt, different run, different output — by
+design. That's not a bug in the model — it's fundamental to how these systems
+work. And it means every pipeline that hands off to a model
+has introduced a source of variance that code alone cannot see coming.
+
+This is where cheaper, faster models deserve specific scrutiny.
+
+Smaller models — the ones that cost a fraction of the price and return results
+in milliseconds — are genuinely useful. But the tradeoff isn't just capability.
+It's predictability. A cheaper model is more likely to drift on key names, more
+likely to hallucinate a field, more likely to return something that's *shaped*
+like the right answer without actually being one. The variance is higher. The
+failure rate is higher. And because it's fast and cheap, you're probably running
+it at higher volume — which means more failures, more often, more quietly.
+
+The guardrails aren't just good practice. They're the deterministic layer that
+sits on top of a non-deterministic system and enforces a contract the model
+cannot enforce on its own:
+
+- Schema validation says: *this shape, every time, or it doesn't count*
+- Error logging says: *every failure leaves a record, no exceptions*
+- Caching says: *same input, same result — we're not asking twice*
+- Call budgets say: *this far and no further, regardless of what the model wants to do*
+
+None of those rules come from the model. The model doesn't know they exist.
+They're code — deterministic, predictable, enforced — wrapped around something
+that is none of those things.
+
+That's the architecture. Not AI *or* code. AI *with* a deterministic corrective
+layer that keeps the variance from becoming your problem.
+
+The cheaper the model, the more important that layer becomes.
 
 ---
 
