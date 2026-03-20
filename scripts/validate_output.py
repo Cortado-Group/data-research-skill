@@ -43,7 +43,7 @@ def validate(data: dict) -> list[dict]:
         errors.append({
             "field": key,
             "rule": "additionalProperties",
-            "message": f"Unexpected key '{key}' — not in schema",
+            "message": f"Unexpected key '{key}': not in schema",
             "value": data[key],
         })
 
@@ -128,7 +128,7 @@ def main():
     try:
         data = json.loads(raw)
     except json.JSONDecodeError as e:
-        print(f"FAIL: Invalid JSON — {e}")
+        print(f"FAIL: Invalid JSON: {e}")
         print(f"Raw output:\n{raw[:500]}")
         sys.exit(1)
 

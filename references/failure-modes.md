@@ -17,7 +17,7 @@ You find out when you get the bill.
 
 **What you see:** Results come back.
 **What's actually happening:** A full Chromium browser is launched for every
-request — to fetch plain text. The CPU overhead is orders of magnitude higher
+request... to fetch plain text. The CPU overhead is orders of magnitude higher
 than a simple HTTP call. The fix is five lines.
 
 **Fix:** Default to HTTP fetch. Only use a headless browser when JS rendering
@@ -34,8 +34,8 @@ times per entity. You paid for that content once but were billed four times.
 ## Discarded error responses
 
 **What you see:** The pipeline flagged some failures.
-**What's actually happening:** The raw error response — the diagnostic artifact
-you paid for — was quietly thrown away. The log says "error" but not *why*.
+**What's actually happening:** The raw error response (the diagnostic artifact
+you paid for) was quietly thrown away. The log says "error" but not *why*.
 
 **Fix:** Always log the full raw response alongside the error status.
 
@@ -43,7 +43,7 @@ you paid for — was quietly thrown away. The log says "error" but not *why*.
 
 **What you see:** The pipeline is processing 5,000 rows. Progress looks great.
 **What's actually happening:** Every result is accumulating in memory. Nothing
-is written until the end. The model thinks this is efficient — gather all the
+is written until the end. The model thinks this is efficient: gather all the
 data, write all the data, one clean operation.
 
 It's a bet that nothing will go wrong across 5,000 API calls, 5,000 parses,
@@ -51,7 +51,7 @@ and 5,000 schema validations. That bet always loses.
 
 An OOM at row 4,999. A rate limit that escalates to a block. A malformed
 response that throws an unhandled exception. A multi-step pipeline where
-transition data lives in memory through ten stages per row — and one bad stage
+transition data lives in memory through ten stages per row, and one bad stage
 flushes all of it. The pipeline doesn't degrade gracefully. It doesn't save
 what it has. It dies, and takes every completed row with it.
 
@@ -112,7 +112,7 @@ matches the contract or the row fails loudly.
 
 **What you see:** 15% error rate. You re-run. 12% error rate. You re-run again.
 Eventually you get enough rows and move on.
-**What's actually happening:** The errors are telling you exactly what's wrong —
+**What's actually happening:** The errors are telling you exactly what's wrong --
 the prompt is ambiguous, the schema doesn't handle a common edge case, or a
 specific source is consistently returning a format the parser doesn't expect.
 Nobody looks. The error rows get thrown away and re-run blindly, paying full
@@ -129,12 +129,12 @@ shouldn't.
 - Are timeouts clustered on certain entities? → Those entities need a different fetch strategy.
 - Is the model inventing data for a specific field? → That field needs a stronger constraint or a `null` allowance.
 
-The error rows are the cheapest research you'll ever do — you already paid for
+The error rows are the cheapest research you'll ever do. You already paid for
 them. Throwing them away and re-running is paying twice to learn nothing.
 
 ## No-code enrichment tools (Clay, etc.)
 
-All the above failures also occur in no-code enrichment tools — but with no
+All the above failures also occur in no-code enrichment tools, but with no
 recourse. You cannot adjust timeouts, clean malformed responses, retry with a
 corrected prompt, or capture what the model actually returned.
 

@@ -9,7 +9,7 @@ a concrete example.
 ```text
 Research the following company and return your findings as a JSON object.
 
-You MUST return valid JSON conforming exactly to this schema — no extra keys,
+You MUST return valid JSON conforming exactly to this schema: no extra keys,
 no renamed keys, no missing required fields. If you are uncertain about a
 value, use null.
 
@@ -90,7 +90,7 @@ def validate(data: dict) -> list[dict]:
         errors.append({
             "field": key,
             "rule": "additionalProperties",
-            "message": f"Unexpected key '{key}' — not in schema",
+            "message": f"Unexpected key '{key}': not in schema",
             "value": data[key],
         })
 
@@ -175,7 +175,7 @@ def main():
     try:
         data = json.loads(raw)
     except json.JSONDecodeError as e:
-        print(f"FAIL: Invalid JSON — {e}")
+        print(f"FAIL: Invalid JSON: {e}")
         print(f"Raw output:\n{raw[:500]}")
         sys.exit(1)
 
