@@ -79,16 +79,15 @@ write all the data, one clean operation.
 It's not efficient. It's a bet that nothing will go wrong across 5,000 API
 calls, 5,000 parses, and 5,000 schema validations. That bet always loses.
 
-An OOM at row 4,999. A rate limit that escalates to a block. A malformed
+At row 4,999... boom! A memory crash. A rate limit that escalates to a block. A malformed
 response that throws an unhandled exception. A multi-step process where
 transition data lives in memory through ten stages per row, and one bad stage
 flushes everything. The pipeline doesn't degrade gracefully. It doesn't save
 what it has. It just dies, and takes every completed row with it.
 
-The model will never suggest flushing to disk after each row. It optimizes for
-the clean path. But production is not the clean path. Production is the path
-where something always goes sideways, and the only question is whether you
-saved your work before it did.
+The model will never start off by suggesting flushing stage data and step data
+as each response comes back. Maybe you'll get there after a few million tokens
+in the bit bucket.
 
 Write each row as it completes. Append to a file, insert to a database, push
 to a queue. It doesn't matter how. What matters is that when the crash comes
