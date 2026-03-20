@@ -1,0 +1,4 @@
+interface:
+  display_name: "Data Research"
+  short_description: "Guardrails for AI data research agents"
+  default_prompt: "Use $data-research to build a data enrichment pipeline with proper caching, backoff, and schema validation."
