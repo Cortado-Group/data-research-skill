@@ -12,8 +12,11 @@ user-invocable: true
 # Data Research Skill
 
 Operational guardrails for AI-driven data research pipelines. Every rule below
-was learned from a real production failure. For the full failure-mode catalog
-with examples, see [references/failure-modes.md](references/failure-modes.md).
+was learned from a real production failure.
+
+- Full failure-mode catalog: [references/failure-modes.md](references/failure-modes.md)
+- Example prompt + validation script: [references/example-schema-validation.md](references/example-schema-validation.md)
+- Runnable validator: [scripts/validate_output.py](scripts/validate_output.py)
 
 ## Fetch rules
 
