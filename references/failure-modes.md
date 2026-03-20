@@ -39,6 +39,30 @@ you paid for — was quietly thrown away. The log says "error" but not *why*.
 
 **Fix:** Always log the full raw response alongside the error status.
 
+## Batch-and-flush: accumulate everything, lose everything
+
+**What you see:** The pipeline is processing 5,000 rows. Progress looks great.
+**What's actually happening:** Every result is accumulating in memory. Nothing
+is written until the end. The model thinks this is efficient — gather all the
+data, write all the data, one clean operation.
+
+It's a bet that nothing will go wrong across 5,000 API calls, 5,000 parses,
+and 5,000 schema validations. That bet always loses.
+
+An OOM at row 4,999. A rate limit that escalates to a block. A malformed
+response that throws an unhandled exception. A multi-step pipeline where
+transition data lives in memory through ten stages per row — and one bad stage
+flushes all of it. The pipeline doesn't degrade gracefully. It doesn't save
+what it has. It dies, and takes every completed row with it.
+
+The model will never suggest flushing to disk after each row. It optimizes for
+the clean path. Production is not the clean path.
+
+**Fix:** Write each row to durable storage as it completes. Append to a file,
+insert to a database, push to a queue. For multi-step pipelines, persist
+intermediate state between stages. When the crash comes, you lose one row
+instead of all of them.
+
 ## Timeout kills completed work
 
 **What you see:** Some rows didn't complete.
@@ -128,6 +152,7 @@ just cost. This is why owning the pipeline matters.
 | Browser for text fetch | 100x CPU overhead per call | Lightest tool first |
 | Redundant URL fetches | 3-4x token/API cost | URL cache |
 | Discarded error responses | Lost diagnostics, blind re-runs | Log raw responses |
+| Batch-and-flush | All results lost on crash | Write each row as it completes |
 | Timeout kills completed work | Full cost, zero output | Incremental persist |
 | Invalid JSON accepted | Full pipeline re-run | Schema validation |
 | Key name drift | Valid data silently dropped | Strict schema |

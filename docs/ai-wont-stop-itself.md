@@ -69,9 +69,36 @@ You can't do that if you're in the habit of quietly deleting the evidence.
 
 ---
 
+### Batch-and-flush: accumulate everything, lose everything
+
+**What you see:** The pipeline is chugging through 5,000 rows. Impressive.
+**What's actually happening:** Every result is being held in memory. Nothing is
+written until the end. The model thinks this is efficient — gather all the data,
+write all the data, one clean operation.
+
+It's not efficient. It's a bet that nothing will go wrong across 5,000 API
+calls, 5,000 parses, and 5,000 schema validations. That bet always loses.
+
+An OOM at row 4,999. A rate limit that escalates to a block. A malformed
+response that throws an unhandled exception. A multi-step process where
+transition data lives in memory through ten stages per row — and one bad stage
+flushes everything. The pipeline doesn't degrade gracefully. It doesn't save
+what it has. It just dies, and takes every completed row with it.
+
+The model will never suggest flushing to disk after each row. It optimizes for
+the clean path. But production is not the clean path. Production is the path
+where something always goes sideways, and the only question is whether you
+saved your work before it did.
+
+Write each row as it completes. Append to a file, insert to a database, push
+to a queue — it doesn't matter how. What matters is that when the crash comes
+(and it will), you lose one row instead of all of them.
+
+---
+
 ### Timeouts killing mid-response
 
-**What you see:** Some rows didn't complete.  
+**What you see:** Some rows didn't complete.
 **What's actually happening:** Long-running research tasks finished their work
 and then got cut off before the output was written. Completed work, zero
 output. Full token cost, nothing to show.
@@ -228,14 +255,25 @@ consistently make expensive, silent mistakes. These rules are the fix.
   - Which validation rule it failed
   - The field(s) involved
   Do not silently mark the row as failed and move on.
-- Completed work must be written incrementally. Do not wait for a full run
-  to complete before persisting output. If a timeout occurs, completed rows
-  should already be saved.
 - Errors are signal, not trash. After a run, review error rows for patterns.
   Repeated schema failures mean the prompt needs tightening. Repeated fetch
   failures mean the target or method needs changing. Do not accept an error
   rate — diagnose it. Every errored row is a feedback loop you either use
   or pay for again next run.
+
+---
+
+## Persistence rules
+
+- Write each row to output as it completes — file, database, queue, anything
+  durable. Do not accumulate results in memory and write once at the end.
+- Assume the process will crash. OOM, rate limit escalation, unhandled
+  exception, timeout — something will go wrong. When it does, every row
+  completed before that point must already be saved.
+- Never hold transition data for a multi-step row pipeline entirely in memory.
+  If each row passes through ten processing stages, persist intermediate
+  state. A failure at stage 9 of row 4,999 should not destroy stages 1-10
+  of rows 1-4,998.
 
 ---
 

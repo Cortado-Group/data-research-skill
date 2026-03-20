@@ -37,8 +37,14 @@ was learned from a real production failure.
 
 - **Never discard a failed response.** Log the full raw output alongside the error — it's diagnostic data you paid for.
 - On schema validation failure, report: raw output, which rule failed, which field(s).
-- **Persist incrementally.** Write completed rows as they finish, not in a batch at the end. A crash should lose one row, not all of them.
 - **Errors are signal, not trash.** After a run, review error rows for patterns. Repeated schema failures mean the prompt needs tightening. Repeated fetch failures mean the target or method needs changing. Do not accept an error rate — diagnose it. Every errored row is a feedback loop you either use or pay for again next run.
+
+## Persistence rules
+
+- **Write each row as it completes.** File, database, queue — anything durable. Do not accumulate results in memory and write once at the end.
+- **Assume the process will crash.** OOM, rate limit escalation, unhandled exception, timeout — something will go wrong. When it does, every row completed before that point must already be saved.
+- **Never hold an entire multi-step pipeline in memory.** If each row passes through ten processing stages, persist intermediate state. A failure at stage 9 of row 4,999 should not destroy rows 1-4,998.
+- The model will default to "gather all, write all" because it looks clean. It is not clean. It is a bet that nothing goes wrong across thousands of calls, and that bet always loses.
 
 ## Completion criteria
 
@@ -61,7 +67,8 @@ Before starting any data research run, confirm:
 - [ ] 429 handling stops retries (not accelerates them)
 - [ ] Default fetch method is HTTP, not browser
 - [ ] Call budget set and tracked
-- [ ] Incremental output persistence enabled
+- [ ] Each row written to durable storage on completion (not batched in memory)
+- [ ] Multi-step pipelines persist intermediate state between stages
 - [ ] Error logging captures raw responses
 - [ ] Schema validation runs before row completion
 - [ ] Post-run error review planned (not just "re-run and hope")
