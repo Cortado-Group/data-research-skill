@@ -1,5 +1,9 @@
 # Data Research Skill
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#license)
+[![Works with Claude Code](https://img.shields.io/badge/Works%20with-Claude%20Code-6b4fbb)](https://github.com/anthropics/claude-code)
+[![Blog post](https://img.shields.io/badge/Read-the%20blog%20post-blue)](https://dev.to/mogwainerfherder/ai-wont-stop-itself-from-being-stupid-thats-your-job-580c)
+
 A portable skill document you drop into any AI agent's system context to prevent the silent, expensive mistakes they make during data research and enrichment.
 
 This is not a library or framework. It's a set of operating rules the model inherits the moment you give it the job.
