@@ -43,12 +43,11 @@ SKILL.md                                 The skill (what the AI reads)
 scripts/validate_output.py               Runnable schema validator
 references/failure-modes.md              Detailed trap catalog with fixes
 references/example-schema-validation.md  Example prompt + validation walkthrough
-docs/ai-wont-stop-itself.md              Blog post with full context
 ```
 
 ## Background
 
-Read the full story: [AI Won't Stop Itself From Being Stupid: That's YOUR Job](docs/ai-wont-stop-itself.md)
+Read the full story: [AI Won't Stop Itself From Being Stupid: That's Your Job](https://dev.to/mogwainerfherder/ai-wont-stop-itself-from-being-stupid-thats-your-job-580c)
 
 ## License
 
