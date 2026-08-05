@@ -17,6 +17,7 @@ was learned from a real production failure.
 - Full failure-mode catalog: [references/failure-modes.md](references/failure-modes.md)
 - Example prompt + validation script: [references/example-schema-validation.md](references/example-schema-validation.md)
 - Runnable validator: [scripts/validate_output.py](scripts/validate_output.py)
+- Concrete scenarios this applies to: [references/use-cases.md](references/use-cases.md)
 
 ## Fetch rules
 
