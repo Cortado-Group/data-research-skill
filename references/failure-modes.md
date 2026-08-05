@@ -4,6 +4,9 @@ Detailed catalog of silent, expensive failures that AI data research agents
 make in production. Each entry describes what you see vs what's actually
 happening, and the rule that prevents it.
 
+For the research and data backing why these failures matter at scale, see
+[evidence.md](evidence.md).
+
 ## Rate limit cascade
 
 **What you see:** The pipeline eventually finishes.

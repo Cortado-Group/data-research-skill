@@ -47,6 +47,7 @@ SKILL.md                                 The skill (what the AI reads)
 scripts/validate_output.py               Runnable schema validator
 references/failure-modes.md              Detailed trap catalog with fixes
 references/example-schema-validation.md  Example prompt + validation walkthrough
+references/evidence.md                   Research and data behind why this matters
 ```
 
 ## Background
